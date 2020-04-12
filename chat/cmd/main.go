@@ -16,6 +16,9 @@ func makeLogger()*logrus.Logger {
 func main() {
 	p := &config.Project{
 		Log: makeLogger(),
+		Server: &config.Server {
+			Address: ":3000",
+		},
 	}
-	server.Make(p)
+	server.Make(p.Server)
 }
