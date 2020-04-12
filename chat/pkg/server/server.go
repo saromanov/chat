@@ -20,9 +20,9 @@ func (s *Server) AddUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // Make provides making of server
-func Make(p *config.Server) {
+func Make(st *storage.Storage, p *config.Project) {
 	s := &Server {
-		db: p.db,
+		db: st,
 	}
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -30,11 +30,11 @@ func Make(p *config.Server) {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
 	})
-	r.Route("/users", func(r chi.Route){
+	r.Route("/users", func(r chi.Router){
 		r.Post("/register", s.AddUser)
 	})
 	server := graceful.WithDefaults(&http.Server{
-        Addr: p.Address,
+        Addr: p.Server.Address,
         Handler: r,
 	})
 	p.Log.WithField("package", "server").Info("main: Starting the server")

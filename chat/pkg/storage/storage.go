@@ -5,6 +5,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/saromanov/experiments/chat/pkg/models"
+	"github.com/saromanov/experiments/chat/pkg/config"
 )
 
 // Storage defines handlling of storage
@@ -13,7 +14,7 @@ type Storage struct {
 }
 
 // New provides definition of
-func New() (*Storage, error) {
+func New(c *config.Project) (*Storage, error) {
 	db, err := sqlx.Connect("postgres", "user=foo dbname=bar sslmode=disable")
 	if err != nil {
 		return nil, err

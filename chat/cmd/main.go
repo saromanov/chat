@@ -4,6 +4,7 @@ import (
 	"os"
 	"github.com/sirupsen/logrus"
 	"github.com/saromanov/experiments/chat/pkg/server"
+	"github.com/saromanov/experiments/chat/pkg/storage"
 	"github.com/saromanov/experiments/chat/pkg/config"
 )
 
@@ -14,11 +15,16 @@ func makeLogger()*logrus.Logger {
 	return l  
 }
 func main() {
+	logger := makeLogger()
 	p := &config.Project{
-		Log: makeLogger(),
+		Log: logger,
 		Server: &config.Server {
 			Address: ":3000",
 		},
 	}
-	server.Make(p.Server)
+	st, err := storage.New(p)
+	if err != nil {
+		logger.WithError(err).Fatalf("unable to load storage")
+	}
+	server.Make(st, p)
 }
