@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -22,10 +21,9 @@ func Make(p *config.Project) {
         Addr: ":3000",
         Handler: r,
 	})
-	fmt.Println("STARTD")
-	p.Log.WithField("level", "server").Info("main: Starting the server")
+	p.Log.WithField("package", "server").Info("main: Starting the server")
     if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
-        p.Log.WithField("level", "server").Fatalln("main: Failed to gracefully shutdown")
+        p.Log.WithField("package", "server").Fatalln("main: Failed to gracefully shutdown")
     }
-	p.Log.WithField("level", "server").Info("main: Server was shutdown gracefully")
+	p.Log.WithField("package", "server").Info("main: Server was shutdown gracefully")
 }

@@ -25,9 +25,9 @@ services:
     networks:
       - test_app
     depends_on:
-      - redis
+      - postgres
 
-  redis:
+  postgres:
     image: postgres:12
     restart: unless-stopped
     volumes:

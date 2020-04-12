@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"github.com/sirupsen/logrus"
 	"github.com/saromanov/experiments/chat/pkg/server"
 	"github.com/saromanov/experiments/chat/pkg/config"
@@ -8,8 +9,8 @@ import (
 
 func makeLogger()*logrus.Logger {
 	l := logrus.New()
+	l.Out = os.Stdout
 	l.SetFormatter(&logrus.JSONFormatter{})
-	l.SetOutput(l.Writer())
 	return l  
 }
 func main() {
