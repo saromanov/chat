@@ -4,9 +4,11 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/render"
 	"github.com/go-chi/chi/middleware"
 	"github.com/ory/graceful"
 	"github.com/saromanov/experiments/chat/pkg/config"
+	"github.com/saromanov/experiments/chat/pkg/models"
 	"github.com/saromanov/experiments/chat/pkg/storage"
 )
 
@@ -16,7 +18,17 @@ type Server struct {
 
 // AddUser provides adding of the new user
 func (s *Server) AddUser(w http.ResponseWriter, r *http.Request) {
-
+	data := &UserRequest{}
+	if err := render.Bind(r, data); err != nil {
+		render.Render(w, r, ErrInvalidRequest(err))
+		return
+	}
+	s.db.AddUser(&models.User{
+		Email: data.Email,
+		FirstName: data.FirstName,
+		LastName: data.LastName,
+	})
+	render.Status(r, http.StatusCreated)
 }
 
 // Make provides making of server
@@ -26,7 +38,8 @@ func Make(st *storage.Storage, p *config.Project) {
 	}
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer) 
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.URLFormat)
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
 	})
