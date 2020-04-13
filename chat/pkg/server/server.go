@@ -50,6 +50,7 @@ func Make(st *storage.Storage, p *config.Project) {
         Addr: p.Server.Address,
         Handler: r,
 	})
+	initPrometheus()
 	p.Log.WithField("package", "server").Info("main: Starting the server")
     if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
         p.Log.WithField("package", "server").Fatalln("main: Failed to gracefully shutdown")

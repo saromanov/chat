@@ -2,7 +2,7 @@ version: '3.2'
 
 volumes:
   tmp-data:
-  redis-data:
+  postgres:
 
 services:
   app:
@@ -30,14 +30,15 @@ services:
   postgres:
     image: postgres:12
     restart: unless-stopped
-    volumes:
-      - postgers:/data/postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_USER: chatapp
+      POSTGRES_DB: chatapp
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      PGDATA: /data/postgres
+      PGDATA: /storage/postgres
+    volumes:
+      - postgres:/storage/postgres
     ports:
-      - "5432":"5432"
+      - "5433:5433"
     networks:
       - test_app
 

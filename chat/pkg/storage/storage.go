@@ -15,7 +15,7 @@ type Storage struct {
 
 // New provides definition of
 func New(c *config.Project) (*Storage, error) {
-	db, err := sqlx.Connect("postgres", "user=foo dbname=bar sslmode=disable")
+	db, err := sqlx.Connect("postgres", "user=chatapp dbname=chatapp host=postgres port=5432 sslmode=disable")
 	if err != nil {
 		return nil, err
 	}

@@ -1,5 +1,5 @@
 # Image page: <https://hub.docker.com/_/golang>
-FROM golang:1.13-alpine as builder
+FROM golang:1.14-alpine as builder
 COPY . /src
 WORKDIR /src
 RUN go build -ldflags="-s -w" -o /tmp/app ./cmd/.

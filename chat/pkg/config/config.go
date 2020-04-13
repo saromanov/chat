@@ -8,6 +8,10 @@ import (
 type Project struct {
 	Log *logrus.Logger
 	Server *Server
+	DatabaseName string
+	DatabaseUser string
+	DatabasePassword string 
+	
 }
 
 // Server provides definition for server config
