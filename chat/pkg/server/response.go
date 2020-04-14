@@ -2,8 +2,10 @@ package server
 
 import (
 	"net/http"
+
 	"github.com/go-chi/render"
 )
+
 type ErrResponse struct {
 	Err            error `json:"-"` // low-level runtime error
 	HTTPStatusCode int   `json:"-"` // http response status code
@@ -25,4 +27,15 @@ func ErrInvalidRequest(err error) render.Renderer {
 		StatusText:     "Invalid request.",
 		ErrorText:      err.Error(),
 	}
+}
+
+// UserResponse defines response for user
+type UserResponse struct {
+	Email     string `json:"email"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+}
+
+func (u *UserResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
 }

@@ -1,25 +1,26 @@
 package server
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/render"
 	"github.com/go-chi/chi/middleware"
-	"github.com/ory/graceful"
-	"github.com/sirupsen/logrus"
 	"github.com/go-chi/jwtauth"
+	"github.com/go-chi/render"
+	"github.com/ory/graceful"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/saromanov/experiments/chat/pkg/config"
 	"github.com/saromanov/experiments/chat/pkg/models"
 	"github.com/saromanov/experiments/chat/pkg/storage"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/sirupsen/logrus"
 )
 
 var tokenAuth *jwtauth.JWTAuth
 
 type Server struct {
-	db *storage.Storage
+	db  *storage.Storage
 	log *logrus.Logger
 }
 
@@ -34,9 +35,9 @@ func (s *Server) AddUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := s.db.AddUser(&models.User{
-		Email: data.Email,
+		Email:     data.Email,
 		FirstName: data.FirstName,
-		LastName: data.LastName,
+		LastName:  data.LastName,
 	}); err != nil {
 		s.log.WithField("func", "AddUser").WithError(err).Errorf("unable to add user")
 		render.Render(w, r, ErrInvalidRequest(err))
@@ -45,14 +46,42 @@ func (s *Server) AddUser(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusCreated)
 }
 
+// GetUser provides getting of user by id
+func (s *Server) GetUser(w http.ResponseWriter, r *http.Request) {
+	s.log.WithField("func", "AddUser").Info("get user by id")
+	userID := chi.URLParam(r, "id")
+	if userID == "" {
+		render.Render(w, r, ErrInvalidRequest(errors.New("userid is not found on request")))
+		return
+	}
+	id, err := strconv.ParseInt(userID, 10, 32)
+	if err != nil {
+		render.Render(w, r, ErrInvalidRequest(err))
+		return
+	}
+	user, err := s.db.GetUserByID(id)
+	if err != nil {
+		render.Render(w, r, ErrInvalidRequest(err))
+		return
+	}
+
+	if err := render.Render(w, r, &UserResponse{
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+	}); err != nil {
+		render.Render(w, r, ErrInvalidRequest(err))
+		return
+	}
+	render.Status(r, http.StatusOK)
+}
+
 // Make provides making of server
 func Make(st *storage.Storage, p *config.Project) {
 	tokenAuth = jwtauth.New("HS256", []byte("secret"), nil)
-	s := &Server {
+	s := &Server{
 		db: st,
-
 	}
-	fmt.Println("ADDERSSERVER: ", p.Server.Address)
 	initPrometheus()
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -62,22 +91,23 @@ func Make(st *storage.Storage, p *config.Project) {
 		totalRequests.Inc()
 		w.Write([]byte("welcome"))
 	})
-	r.Route("/users", func(r chi.Router){
+	r.Route("/users", func(r chi.Router) {
 		r.Post("/register", s.AddUser)
 	})
 
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(jwtauth.Authenticator)
+		r.Get("/users/{id}", s.GetUser)
 	})
 	r.Handle("/metrics", promhttp.Handler())
 	server := graceful.WithDefaults(&http.Server{
-        Addr: p.Server.Address,
-        Handler: r,
+		Addr:    p.Server.Address,
+		Handler: r,
 	})
 	p.Log.WithField("package", "server").Info("main: Starting the server")
-    if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
-        p.Log.WithField("package", "server").Fatalln("main: Failed to gracefully shutdown")
-    }
+	if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
+		p.Log.WithField("package", "server").Fatalln("main: Failed to gracefully shutdown")
+	}
 	p.Log.WithField("package", "server").Info("main: Server was shutdown gracefully")
 }
