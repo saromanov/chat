@@ -7,19 +7,25 @@ import (
 	"github.com/go-chi/render"
 	"github.com/go-chi/chi/middleware"
 	"github.com/ory/graceful"
+	"github.com/go-chi/jwtauth"
 	"github.com/saromanov/experiments/chat/pkg/config"
 	"github.com/saromanov/experiments/chat/pkg/models"
 	"github.com/saromanov/experiments/chat/pkg/storage"
 )
 
+var tokenAuth *jwtauth.JWTAuth
+
 type Server struct {
 	db *storage.Storage
+	log *logrus.Logger
 }
 
 // AddUser provides adding of the new user
 func (s *Server) AddUser(w http.ResponseWriter, r *http.Request) {
+	s.log.WithField("func": "AddUser").Info("registered request for add new user")
 	data := &UserRequest{}
 	if err := render.Bind(r, data); err != nil {
+		s.log.WithField("func": "AddUser").Errorf("unable to unmarshal request")
 		render.Render(w, r, ErrInvalidRequest(err))
 		return
 	}
@@ -33,8 +39,10 @@ func (s *Server) AddUser(w http.ResponseWriter, r *http.Request) {
 
 // Make provides making of server
 func Make(st *storage.Storage, p *config.Project) {
+	tokenAuth = jwtauth.New("HS256", []byte("secret"), nil)
 	s := &Server {
 		db: st,
+
 	}
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -45,6 +53,11 @@ func Make(st *storage.Storage, p *config.Project) {
 	})
 	r.Route("/users", func(r chi.Router){
 		r.Post("/register", s.AddUser)
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Use(jwtauth.Verifier(tokenAuth))
+		r.Use(jwtauth.Authenticator)
 	})
 	server := graceful.WithDefaults(&http.Server{
         Addr: p.Server.Address,
