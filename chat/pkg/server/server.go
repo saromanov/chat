@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
@@ -54,21 +55,7 @@ func (s *Server) AddUser(w http.ResponseWriter, r *http.Request) {
 // @Router /users/{id} [get]
 func (s *Server) GetUser(w http.ResponseWriter, r *http.Request) {
 	s.log.WithField("func", "AddUser").Info("get user by id")
-	userID := chi.URLParam(r, "id")
-	if userID == "" {
-		render.Render(w, r, ErrInvalidRequest(errors.New("userid is not found on request"), 400))
-		return
-	}
-	id, err := strconv.ParseInt(userID, 10, 32)
-	if err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, 400))
-		return
-	}
-	user, err := s.db.GetUserByID(id)
-	if err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, 404))
-		return
-	}
+	user := r.Context().Value("user").(*models.User)
 
 	if err := render.Render(w, r, &UserResponse{
 		Email:     user.Email,
@@ -79,6 +66,29 @@ func (s *Server) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	render.Status(r, http.StatusOK)
+}
+
+// UsersCtx provides handling of context for users endpoints
+func (s *Server) UsersCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID := chi.URLParam(r, "id")
+		if userID == "" {
+			render.Render(w, r, ErrInvalidRequest(errors.New("userid is not found on request"), 400))
+			return
+		}
+		id, err := strconv.ParseInt(userID, 10, 32)
+		if err != nil {
+			render.Render(w, r, ErrInvalidRequest(err, 400))
+			return
+		}
+		user, err := s.db.GetUserByID(id)
+		if err != nil {
+			render.Render(w, r, ErrInvalidRequest(err, 404))
+			return
+		}
+		ctx := context.WithValue(r.Context(), "user", user)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 // Make provides making of server
@@ -105,6 +115,11 @@ func Make(st *storage.Storage, p *config.Project) {
 		r.Use(jwtauth.Authenticator)
 		r.Get("/users/{id}", s.GetUser)
 	})
+	r.Route("/users/{id}", func(r chi.Router) {
+		r.Use(s.UsersCtx)
+		r.Get("/users/{id}", s.GetUser)
+	})
+
 	r.Handle("/metrics", promhttp.Handler())
 	server := graceful.WithDefaults(&http.Server{
 		Addr:    p.Server.Address,
