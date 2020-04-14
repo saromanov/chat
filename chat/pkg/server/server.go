@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -51,6 +52,7 @@ func Make(st *storage.Storage, p *config.Project) {
 		db: st,
 
 	}
+	fmt.Println("ADDERSSERVER: ", p.Server.Address)
 	initPrometheus()
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)

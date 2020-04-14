@@ -1,11 +1,12 @@
 package main
 
 import (
+	"os"
+
 	"github.com/saromanov/experiments/chat/pkg/config"
 	"github.com/saromanov/experiments/chat/pkg/server"
 	"github.com/saromanov/experiments/chat/pkg/storage"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 func makeLogger() *logrus.Logger {
@@ -19,7 +20,7 @@ func main() {
 	p := &config.Project{
 		Log: logger,
 		Server: &config.Server{
-			Address: ":3000",
+			Address: ":3005",
 		},
 		DatabaseHost:     os.Getenv("POSTGRES_HOST"),
 		DatabaseUser:     os.Getenv("POSTGRES_USER"),

@@ -12,7 +12,7 @@ services:
     working_dir: /src
     command: ./golang-developer-test-task
     ports:
-      - "3000:3000"
+      - "3005:3005"
     restart: unless-stopped
     environment:
       HOME: /tmp
@@ -63,7 +63,22 @@ services:
       - INFLUXDB_USER_PASSWORD=password
       - INFLUXDB_READ_USER=grafana
       - INFLUXDB_READ_USER_PASSWORD=password
-      
+  prometheus:
+    image: prom/prometheus:master
+    ports:
+      - 9090:9090
+    volumes:
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command: [
+      "--config.file=/etc/prometheus/prometheus.yml",
+      "--log.level=debug",
+      "--storage.tsdb.path=/prometheus",
+      "--storage.tsdb.retention=1h",
+      "--web.enable-admin-api",
+    ]
+    depends_on:
+      - prometheus-influxdb-adapter
+
   prometheus-influxdb-adapter: 
     image: kaorimatz/prometheus-influxdb-adapter
     ports: 
@@ -84,6 +99,12 @@ services:
     depends_on:
       - influxdb
 
-
+  grafana:
+    image: grafana/grafana:master
+    ports:
+      - 3000:3000
+    volumes:
+      - ./configs/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ./configs/grafana/datasources:/etc/grafana/provisioning/datasources:ro
 networks:
   test_app:
