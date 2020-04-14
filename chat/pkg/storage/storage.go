@@ -1,11 +1,14 @@
 package storage
 
 import (
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 
-	"github.com/saromanov/experiments/chat/pkg/models"
 	"github.com/saromanov/experiments/chat/pkg/config"
+	"github.com/saromanov/experiments/chat/pkg/models"
 )
 
 // Storage defines handlling of storage
@@ -15,7 +18,9 @@ type Storage struct {
 
 // New provides definition of
 func New(c *config.Project) (*Storage, error) {
-	db, err := sqlx.Connect("postgres", "user=chatapp dbname=chatapp host=postgres port=5432 sslmode=disable")
+	url := fmt.Sprintf("sslmode=disable user=%s dbname=%s host=%s port=5432 password=%s", c.DatabaseUser, c.DatabaseName, c.DatabaseHost, c.DatabasePassword)
+	fmt.Println(url)
+	db, err := sqlx.Connect("postgres", fmt.Sprintf("sslmode=disable user=%s dbname=%s host=%s port=5432 password=%s", c.DatabaseUser, c.DatabaseName, c.DatabaseHost, c.DatabasePassword))
 	if err != nil {
 		return nil, err
 	}
@@ -27,6 +32,15 @@ func New(c *config.Project) (*Storage, error) {
 
 func (s *Storage) AddUser(u *models.User) {
 	tx := s.db.MustBegin()
-    tx.MustExec("INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4)", u.FirstName, u.LastName, u.Email, u.Password)
-    tx.Commit()
+	tx.MustExec("INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4)", u.FirstName, u.LastName, u.Email, u.Password)
+	tx.Commit()
+}
+
+func (s *Storage) GetUserByID(id int64) (*models.User, error) {
+	var user *models.User
+	tx := s.db.MustBegin()
+	if err := tx.Get(&user, "SELECT * FROM users WHERE id = $1", id); err != nil {
+		return nil, errors.Wrap(err, "unable to get users")
+	}
+	return user, nil
 }

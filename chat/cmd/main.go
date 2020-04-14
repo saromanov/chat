@@ -21,6 +21,10 @@ func main() {
 		Server: &config.Server {
 			Address: ":3000",
 		},
+		DatabaseHost: "postgres",
+		DatabaseUser: "chatapp",
+		DatabasePassword: os.Getenv("POSTGRES_PASSWORD"),
+		DatabaseName: "chatapp",
 	}
 	st, err := storage.New(p)
 	if err != nil {

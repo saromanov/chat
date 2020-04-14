@@ -10,7 +10,8 @@ type Project struct {
 	Server *Server
 	DatabaseName string
 	DatabaseUser string
-	DatabasePassword string 
+	DatabasePassword string
+	DatabaseHost string
 	
 }
 

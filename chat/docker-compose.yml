@@ -17,6 +17,7 @@ services:
     environment:
       HOME: /tmp
       GOPATH: /tmp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro
@@ -33,10 +34,10 @@ services:
     environment:
       POSTGRES_USER: chatapp
       POSTGRES_DB: chatapp
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      PGDATA: /storage/postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /storage/postgres-data
     volumes:
-      - postgres:/storage/postgres
+      - postgres:/storage/postgres-data
     ports:
       - "5433:5433"
     networks:
