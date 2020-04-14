@@ -17,6 +17,9 @@ services:
     environment:
       HOME: /tmp
       GOPATH: /tmp
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - /etc/passwd:/etc/passwd:ro

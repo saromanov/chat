@@ -7,10 +7,12 @@ import (
 	"github.com/go-chi/render"
 	"github.com/go-chi/chi/middleware"
 	"github.com/ory/graceful"
+	"github.com/sirupsen/logrus"
 	"github.com/go-chi/jwtauth"
 	"github.com/saromanov/experiments/chat/pkg/config"
 	"github.com/saromanov/experiments/chat/pkg/models"
 	"github.com/saromanov/experiments/chat/pkg/storage"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var tokenAuth *jwtauth.JWTAuth
@@ -22,18 +24,23 @@ type Server struct {
 
 // AddUser provides adding of the new user
 func (s *Server) AddUser(w http.ResponseWriter, r *http.Request) {
-	s.log.WithField("func": "AddUser").Info("registered request for add new user")
+	s.log.WithField("func", "AddUser").Info("registered request for add new user")
+	totalRequests.Inc()
 	data := &UserRequest{}
 	if err := render.Bind(r, data); err != nil {
-		s.log.WithField("func": "AddUser").Errorf("unable to unmarshal request")
+		s.log.WithField("func", "AddUser").WithError(err).Errorf("unable to unmarshal request")
 		render.Render(w, r, ErrInvalidRequest(err))
 		return
 	}
-	s.db.AddUser(&models.User{
+	if err := s.db.AddUser(&models.User{
 		Email: data.Email,
 		FirstName: data.FirstName,
 		LastName: data.LastName,
-	})
+	}); err != nil {
+		s.log.WithField("func", "AddUser").WithError(err).Errorf("unable to add user")
+		render.Render(w, r, ErrInvalidRequest(err))
+		return
+	}
 	render.Status(r, http.StatusCreated)
 }
 
@@ -44,11 +51,13 @@ func Make(st *storage.Storage, p *config.Project) {
 		db: st,
 
 	}
+	initPrometheus()
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.URLFormat)
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		totalRequests.Inc()
 		w.Write([]byte("welcome"))
 	})
 	r.Route("/users", func(r chi.Router){
@@ -59,11 +68,11 @@ func Make(st *storage.Storage, p *config.Project) {
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(jwtauth.Authenticator)
 	})
+	r.Handle("/metrics", promhttp.Handler())
 	server := graceful.WithDefaults(&http.Server{
         Addr: p.Server.Address,
         Handler: r,
 	})
-	initPrometheus()
 	p.Log.WithField("package", "server").Info("main: Starting the server")
     if err := graceful.Graceful(server.ListenAndServe, server.Shutdown); err != nil {
         p.Log.WithField("package", "server").Fatalln("main: Failed to gracefully shutdown")
