@@ -8,7 +8,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./images/chat/Dockerfile
     working_dir: /src
     command: ./golang-developer-test-task
     ports:
@@ -32,7 +32,9 @@ services:
       - postgres
 
   postgres:
-    image: postgres:12
+    build:
+      context: .
+      dockerfile: ./images/postgresql/Dockerfile
     restart: unless-stopped
     environment:
       POSTGRES_USER: chatapp
