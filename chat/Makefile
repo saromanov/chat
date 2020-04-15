@@ -44,7 +44,7 @@ run: ## Run app without building binary file
 	$(DC_BIN) run $(DC_RUN_ARGS) go run ./cmd/. $(GO_RUN_ARGS)
 
 compose-run:
-	./environments/prod.sh
+	./scripts/prod.sh
 
 shell: ## Start shell into container with golang
 	$(DC_BIN) run $(DC_RUN_ARGS) bash
