@@ -30,16 +30,6 @@ func New(c *config.Project) (*Storage, error) {
 	}, nil
 }
 
-// AddUser provides adding of the new user
-func (s *Storage) AddUser(u *models.User) error {
-	tx := s.db.MustBegin()
-	tx.MustExec("INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4)", u.FirstName, u.LastName, u.Email, u.Password)
-	if err := tx.Commit(); err != nil {
-		return errors.Wrap(err, "unable to commit changes")
-	}
-	return nil
-}
-
 // GetUserByID provides getting user by id
 func (s *Storage) GetUserByID(id int64) (*models.User, error) {
 	var user *models.User

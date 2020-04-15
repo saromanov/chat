@@ -19,6 +19,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pressly/goose v2.6.0+incompatible // indirect
 	github.com/prometheus/client_golang v1.5.1
+	github.com/saromanov/chi v4.0.0+incompatible
 	github.com/sirupsen/logrus v1.5.0
 	github.com/swaggo/swag v1.6.5 // indirect
 	github.com/urfave/cli v1.22.4 // indirect
