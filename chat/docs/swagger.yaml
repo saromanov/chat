@@ -20,6 +20,20 @@ info:
   contact: {}
   license: {}
 paths:
+  /messages:
+    post:
+      produces:
+      - application/json
+      responses:
+        "201": {}
+      summary: Retrieves user based on given ID
+  /users:
+    post:
+      produces:
+      - application/json
+      responses:
+        "201": {}
+      summary: Retrieves user based on given ID
   /users/{id}:
     get:
       parameters:

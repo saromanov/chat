@@ -5,6 +5,28 @@
         "license": {}
     },
     "paths": {
+        "/messages": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Retrieves user based on given ID",
+                "responses": {
+                    "201": {}
+                }
+            }
+        },
+        "/users": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Retrieves user based on given ID",
+                "responses": {
+                    "201": {}
+                }
+            }
+        },
         "/users/{id}": {
             "get": {
                 "produces": [
