@@ -26,6 +26,10 @@ type Server struct {
 }
 
 // AddUser provides adding of the new user
+// @Summary Retrieves user based on given ID
+// @Produce json
+// @Success 201
+// @Router /users [post]
 func (s *Server) AddUser(w http.ResponseWriter, r *http.Request) {
 	s.log.WithField("func", "AddUser").Info("registered request for add new user")
 	totalRequests.Inc()
@@ -115,9 +119,8 @@ func Make(st *storage.Storage, p *config.Project) {
 		r.Use(jwtauth.Authenticator)
 		r.Get("/users/{id}", s.GetUser)
 	})
-	r.Route("/users/{id}", func(r chi.Router) {
+	r.Route("/admin", func(r chi.Router) {
 		r.Use(s.UsersCtx)
-		r.Get("/users/{id}", s.GetUser)
 	})
 
 	r.Handle("/metrics", promhttp.Handler())
