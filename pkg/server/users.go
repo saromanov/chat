@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/render"
 	"github.com/go-chi/chi"
-	"github.com/saromanov/experiments/chat/pkg/models"
+	"github.com/go-chi/render"
+	"github.com/saromanov/chat/pkg/models"
 )
 
 // AddUser provides adding of the new user

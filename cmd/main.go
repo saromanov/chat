@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/saromanov/experiments/chat/pkg/config"
-	"github.com/saromanov/experiments/chat/pkg/server"
-	"github.com/saromanov/experiments/chat/pkg/storage"
+	"github.com/saromanov/chat/pkg/config"
+	"github.com/saromanov/chat/pkg/server"
+	"github.com/saromanov/chat/pkg/storage"
 	"github.com/sirupsen/logrus"
 )
 

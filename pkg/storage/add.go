@@ -2,7 +2,7 @@ package storage
 
 import (
 	"github.com/pkg/errors"
-	"github.com/saromanov/experiments/chat/pkg/models"
+	"github.com/saromanov/chat/pkg/models"
 )
 
 // AddUser provides adding of the new user

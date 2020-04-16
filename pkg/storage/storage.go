@@ -7,8 +7,8 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	"github.com/saromanov/experiments/chat/pkg/config"
-	"github.com/saromanov/experiments/chat/pkg/models"
+	"github.com/saromanov/chat/pkg/config"
+	"github.com/saromanov/chat/pkg/models"
 )
 
 // Storage defines handlling of storage

@@ -8,8 +8,8 @@ import (
 	"github.com/go-chi/jwtauth"
 	"github.com/ory/graceful"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/saromanov/experiments/chat/pkg/config"
-	"github.com/saromanov/experiments/chat/pkg/storage"
+	"github.com/saromanov/chat/pkg/config"
+	"github.com/saromanov/chat/pkg/storage"
 	"github.com/sirupsen/logrus"
 )
 
