@@ -63,7 +63,6 @@ services:
     ]
     links:
       - cadvisor:cadvisor
-      - alertmanager:alertmanager
     depends_on:
       - cadvisor
   node-exporter:
@@ -94,20 +93,7 @@ services:
       - ./configs/grafana/datasources:/etc/grafana/provisioning/datasources:ro
     depends_on:
       - prometheus
-  
-  alertmanager:
-    image: prom/alertmanager
-    ports:
-      - 9093:9093
-    volumes:
-      - ./alertmanager/:/etc/alertmanager/
-    networks:
-      - test_app
-    restart: always
-    command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'
-  
+
   cadvisor:
     image: google/cadvisor
     volumes:
