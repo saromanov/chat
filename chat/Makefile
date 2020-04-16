@@ -49,9 +49,9 @@ compose-run:
 shell: ## Start shell into container with golang
 	$(DC_BIN) run $(DC_RUN_ARGS) bash
 
-image: ## Build docker image with app
-	$(DOCKER_BIN) build -f ./Dockerfile -t $(APP_NAME) .
-	@printf "\n   \e[1;45m %s \033[0m\n\n" "Now you can run \`docker run $(APP_NAME) <your_args>\`";
+image-push: ## Build docker image with app
+	$(DOCKER_BIN) build -f ./images/chat/Dockerfile -t motorcode/$(APP_NAME):0.0.1 .
+	$(DOCKER_BIN) push motorcode/$(APP_NAME):0.0.1
 
 clean: ## Make clean
 	$(DC_BIN) down -v -t 1
