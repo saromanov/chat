@@ -46,7 +46,6 @@ func (s *Server) AddUser(w http.ResponseWriter, r *http.Request) {
 func (s *Server) GetUser(w http.ResponseWriter, r *http.Request) {
 	s.log.WithField("func", "AddUser").Info("get user by id")
 	user := r.Context().Value("user").(*models.User)
-
 	if err := render.Render(w, r, &UserResponse{
 		Email:     user.Email,
 		FirstName: user.FirstName,
