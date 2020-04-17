@@ -38,6 +38,7 @@ func Make(st *storage.Storage, p *config.Project) {
 		w.Write([]byte("welcome"))
 	})
 	r.Route("/users", func(r chi.Router) {
+		totalRequests.Inc()
 		r.Post("/register", s.AddUser)
 	})
 
