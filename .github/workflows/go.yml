@@ -35,7 +35,7 @@ jobs:
       - name: Get
         run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.24.0
       - name: Lint in
-        run: golangci-lint run
+        run: $GOPATH/bin/golangci-lint run
       
   test:
     strategy:
@@ -52,4 +52,4 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v1
     - name: Run tests
-      run: go test -v -covermode=count
+      run: go test -v ./... -covermode=count
