@@ -28,9 +28,11 @@ func Make(st *storage.Storage, p *config.Project) {
 	}
 	initPrometheus()
 	r := chi.NewRouter()
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(middleware.URLFormat)
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		totalRequests.Inc()
 		w.Write([]byte("welcome"))

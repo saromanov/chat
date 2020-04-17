@@ -18,9 +18,12 @@ func makeLogger() *logrus.Logger {
 
 func main() {
 	logger := makeLogger()
-	p, err := config.LoadConfig()
+	p, err := config.LoadConfig("./configs/app/app.yaml")
 	if err != nil {
 		logger.WithError(err).Fatalf("unable to load config")
+	}
+	if p == nil {
+		logger.Fatalf("unable to load config")
 	}
 	p.DatabasePassword = os.Getenv("POSTGRES_PASSWORD")
 	p.DatabaseHost = os.Getenv("POSTGRES_HOST")

@@ -1,4 +1,5 @@
-address: ":3005"
+server:
+    address: ":3005"
 databaseName: chatapp
 databaseUser: chatapp
 

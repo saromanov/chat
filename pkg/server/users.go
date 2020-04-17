@@ -70,7 +70,7 @@ func (s *Server) UsersCtx(next http.Handler) http.Handler {
 			render.Render(w, r, ErrInvalidRequest(err, 400))
 			return
 		}
-		user, err := s.db.GetUserByID(id)
+		user, err := s.db.GetUser(id)
 		if err != nil {
 			render.Render(w, r, ErrInvalidRequest(err, 404))
 			return
