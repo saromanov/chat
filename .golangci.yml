@@ -24,15 +24,15 @@ linters-settings:
       line-length: 140
     goimports:
       local-prefixes: github.com/golangci/golangci-lint
-  
-  linters:
+
+linters:
     enable-all: true
     disable:
       - maligned
       - prealloc
       - wsl
   
-  run:
+run:
     skip-dirs:
       - test/testdata_etc
     skip-files:
