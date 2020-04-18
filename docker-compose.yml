@@ -9,7 +9,9 @@ services:
     image: motorcode/chat:0.0.1
     working_dir: /src
     ports:
-      - "3005:3005"
+      -
+        target: 3005
+        published: 3005
     restart: unless-stopped
     environment:
       HOME: /tmp
@@ -27,6 +29,10 @@ services:
       - test_app
     depends_on:
       - postgres
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
 
   postgres:
     image: motorcode/chat-postgres:0.0.1
