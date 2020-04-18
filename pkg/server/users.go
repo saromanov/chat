@@ -51,9 +51,11 @@ func (s *Server) GetUser(w http.ResponseWriter, r *http.Request) {
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 	}); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err, 400))
+		writeStatusCode(http.StatusInternalServerError, "GetUser")
+		render.Render(w, r, ErrInvalidRequest(err, 500))
 		return
 	}
+	writeStatusCode(http.StatusOK, "GetUser")
 	render.Status(r, http.StatusOK)
 }
 

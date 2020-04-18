@@ -6,9 +6,7 @@ volumes:
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: ./images/chat/Dockerfile
+    image: motorcode/chat:0.0.1
     working_dir: /src
     ports:
       - "3005:3005"

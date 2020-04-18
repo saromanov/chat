@@ -48,6 +48,9 @@ run: ## Run app without building binary file
 compose-run:
 	./scripts/prod.sh
 
+swarm-run:
+	$(DOCKER_BIN) stack deploy --compose-file docker-compose.yml chat
+
 shell: ## Start shell into container with golang
 	$(DC_BIN) run $(DC_RUN_ARGS) bash
 

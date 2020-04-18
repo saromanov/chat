@@ -35,7 +35,7 @@ func Make(st *storage.Storage, p *config.Project) {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		totalRequests.Inc()
-		w.Write([]byte("welcome"))
+		w.Write([]byte("welcome")) //nolint
 	})
 	r.Route("/users", func(r chi.Router) {
 		totalRequests.Inc()
