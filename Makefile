@@ -41,7 +41,9 @@ cover: ## Run app tests with coverage report
 	-sensible-browser ./coverage.html && sleep 2 && rm -f ./coverage.html
 
 run: ## Run app without building binary file
-	$(DC_BIN) run $(DC_RUN_ARGS) go run ./cmd/. $(GO_RUN_ARGS)
+	swag init -g pkg/server/server.go
+	golangci-lint run ./...
+	go run ./cmd/. $(GO_RUN_ARGS)
 
 compose-run:
 	./scripts/prod.sh
