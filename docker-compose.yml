@@ -29,9 +29,7 @@ services:
       - postgres
 
   postgres:
-    build:
-      context: .
-      dockerfile: ./images/postgresql/Dockerfile
+    image: motorcode/chat-postgres:0.0.1
     restart: unless-stopped
     environment:
       POSTGERS_USER: chatapp
