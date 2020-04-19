@@ -7,6 +7,7 @@ DOCKER_BIN = $(shell command -v docker 2> /dev/null)
 DC_BIN = $(shell command -v docker-compose 2> /dev/null)
 DC_RUN_ARGS = --rm --user "$(shell id -u):$(shell id -g)" app
 APP_NAME = $(notdir $(CURDIR))
+CURRENT_TAG=$(shell git describe --exact-match --tags $(git log -n1 --pretty='%h') | cut -c 2-)
 GO_RUN_ARGS ?=
 
 .PHONY : help build fmt lint gotest test cover run shell redis-cli image clean
@@ -19,7 +20,7 @@ help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[32m%-11s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 build: ## Build app binary file
-	go build -o chat ./cmd/main.go
+	go build -o chat $(APP_NAME)
 
 fmt: ## Run source code formatter tools
 	$(DC_BIN) run $(DC_RUN_ARGS) sh -c 'GO111MODULE=off go get golang.org/x/tools/cmd/goimports && $$GOPATH/bin/goimports -d -w .'
@@ -56,8 +57,8 @@ shell: ## Start shell into container with golang
 	$(DC_BIN) run $(DC_RUN_ARGS) bash
 
 image-push: ## Build docker image with app
-	$(DOCKER_BIN) build -f ./images/chat/Dockerfile -t motorcode/$(APP_NAME):0.0.1 .
-	$(DOCKER_BIN) push motorcode/$(APP_NAME):0.0.1
+	$(DOCKER_BIN) build -f ./images/chat/Dockerfile -t motorcode/$(APP_NAME):$(CURRENT_TAG) .
+	$(DOCKER_BIN) push motorcode/$(APP_NAME):$(CURRENT_TAG)
 
 clean: ## Make clean
 	$(DC_BIN) down -v -t 1

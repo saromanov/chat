@@ -12,6 +12,7 @@ require (
 	github.com/lib/pq v1.3.0
 	github.com/ory/graceful v0.1.1
 	github.com/pkg/errors v0.9.1
+	github.com/pressly/goose v2.6.0+incompatible
 	github.com/prometheus/client_golang v1.5.1
 	github.com/saromanov/cowrow v0.0.0-20200409190230-745380e3c39c
 	github.com/sirupsen/logrus v1.5.0
