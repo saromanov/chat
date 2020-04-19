@@ -2,10 +2,12 @@ package storage
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-
+	"github.com/pkg/errors"
+	"github.com/pressly/goose"
 	"github.com/saromanov/chat/pkg/config"
 )
 
@@ -26,4 +28,28 @@ func New(c *config.Project) (*Storage, error) {
 	return &Storage{
 		db: db,
 	}, nil
+}
+
+// Prepare provides applying of helpful methods after init of db
+func (s *Storage) Prepare() error {
+
+	if err := s.applyMigrations(); err != nil {
+		return errors.Wrap(err, "apply migrations was failed")
+	}
+	return nil
+}
+
+// applyMigrations provides applying of available migrations
+func (s *Storage) applyMigrations() error {
+
+	path := os.Getenv("MIGRATIONS_PATH")
+	if path == "" {
+		return errors.New("variable MIGRATIONS_PATH is not set")
+	}
+
+	if err := goose.Up(s.db.DB, path); err != nil {
+		return errors.Wrap(err, "unable to apply migrations")
+	}
+
+	return nil
 }

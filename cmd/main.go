@@ -32,5 +32,8 @@ func main() {
 	if err != nil {
 		logger.WithError(err).Fatalf("unable to load storage")
 	}
+	if err := st.Prepare(); err != nil {
+		logger.WithError(err).Fatalf("unable to prepare storage")
+	}
 	server.Make(st, p)
 }
