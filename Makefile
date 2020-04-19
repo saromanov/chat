@@ -1,6 +1,4 @@
 #!/usr/bin/make
-# Makefile readme (ru): <http://linux.yaroslavl.ru/docs/prog/gnu_make_3-79_russian_manual.html>
-# Makefile readme (en): <https://www.gnu.org/software/make/manual/html_node/index.html#SEC_Contents>
 
 SHELL = /bin/sh
 LDFLAGS = "-s -w"
@@ -49,7 +47,10 @@ compose-run:
 	./scripts/prod.sh
 
 swarm-run:
-	$(DOCKER_BIN) stack deploy --compose-file docker-compose.yml chat
+	$(DOCKER_BIN) stack deploy --compose-file docker-compose.yml $(APP_NAME)
+
+swarm-rm:
+	$(DOCKER_BIN) stack rm $(APP_NAME)
 
 shell: ## Start shell into container with golang
 	$(DC_BIN) run $(DC_RUN_ARGS) bash
