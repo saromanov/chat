@@ -1,0 +1,97 @@
+version: '3.2'
+
+volumes:
+  tmp-data:
+  postgres:
+
+services:
+  app:
+    image: motorcode/chat:0.0.1
+    working_dir: /src
+    ports:
+      -
+        target: 3005
+        published: 3005
+    restart: unless-stopped
+    environment:
+      HOME: /tmp
+      GOPATH: /tmp
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MIGRATIONS_PATH: ./migrations
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+      - .:/src:cached
+      - tmp-data:/tmp:cached
+    networks:
+      - test_app
+    depends_on:
+      - postgres
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+  postgres:
+    image: motorcode/chat-postgres:0.0.1
+    restart: unless-stopped
+    environment:
+      POSTGERS_USER: chatapp
+      POSTGERS_NAME: chatapp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /storage/postgres-data
+    volumes:
+      - postgres:/storage/postgres-data
+    ports:
+      - "5433:5433"
+    networks:
+      - test_app
+  
+  prometheus:
+    image: prom/prometheus:master
+    ports:
+      - 9090:9090
+    volumes:
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command: [
+      "--config.file=/etc/prometheus/prometheus.yml",
+      "--log.level=debug",
+      "--storage.tsdb.path=/prometheus",
+      "--storage.tsdb.retention=1h",
+      "--web.enable-admin-api",
+    ]
+  node-exporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command: 
+      - '--path.procfs=/host/proc' 
+      - '--path.sysfs=/host/sys'
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    ports:
+      - 9100:9100
+    networks:
+      - test_app
+    restart: always
+    deploy:
+      mode: global
+
+  grafana:
+    image: grafana/grafana:master
+    ports:
+      - 3000:3000
+    volumes:
+      - ./configs/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ./configs/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - test_app
+networks:
+  test_app:
