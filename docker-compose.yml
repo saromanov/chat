@@ -52,6 +52,8 @@ services:
   
   prometheus:
     image: prom/prometheus:master
+    networks: 
+      - test_app
     ports:
       - 9090:9090
     volumes:
@@ -70,6 +72,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=secret
     ports:
       - 3000:3000
+    networks: 
+      - test_app
     volumes:
       - ./configs/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./configs/grafana/datasources:/etc/grafana/provisioning/datasources:ro
