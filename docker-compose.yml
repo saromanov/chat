@@ -63,28 +63,6 @@ services:
       "--storage.tsdb.retention=1h",
       "--web.enable-admin-api",
     ]
-    links:
-      - cadvisor:cadvisor
-    depends_on:
-      - cadvisor
-  node-exporter:
-    image: prom/node-exporter
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command: 
-      - '--path.procfs=/host/proc' 
-      - '--path.sysfs=/host/sys'
-      - --collector.filesystem.ignored-mount-points
-      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
-    ports:
-      - 9100:9100
-    networks:
-      - test_app
-    restart: always
-    deploy:
-      mode: global
 
   grafana:
     image: grafana/grafana:master

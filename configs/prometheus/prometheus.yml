@@ -38,15 +38,11 @@ scrape_configs:
 
 
   - job_name: 'app'
+    static_configs:
+    - targets: ['app:3005']
 
     # Override the global default and scrape targets from this job every 5 seconds.
     scrape_interval: 5s
-
-    dns_sd_configs:
-    - names:
-      - 'tasks.app'
-      type: 'A'
-      port: 3005
 
 #     static_configs:
 #          - targets: ['cadvisor:8080']
