@@ -28,6 +28,7 @@ func Make(st *storage.Storage, p *config.Project) {
 	}
 	initPrometheus()
 	r := chi.NewRouter()
+	r.Handle("/metrics", promhttp.Handler())
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
@@ -54,7 +55,6 @@ func Make(st *storage.Storage, p *config.Project) {
 		r.Use(s.UsersCtx)
 	})
 
-	r.Handle("/metrics", promhttp.Handler())
 	server := graceful.WithDefaults(&http.Server{
 		Addr:    p.Server.Address,
 		Handler: r,
