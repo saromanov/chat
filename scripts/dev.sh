@@ -1,4 +1,4 @@
-POSTGRES_HOST=localhost
-POSTGRES_DB=chatapp
-POSTGRES_USER=chatapp
-go run ../cmd/main.go
+export POSTGRES_HOST=postgres
+export POSTGRES_DB=chatapp
+export POSTGRES_USER=chatapp
+docker-compose up -f docker-compose-dev.yml --build

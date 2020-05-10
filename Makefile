@@ -47,6 +47,9 @@ run: ## Run app without building binary file
 compose-run:
 	./scripts/prod.sh
 
+compose-run:
+	./scripts/dev.sh
+
 swarm-run:
 	$(DOCKER_BIN) stack deploy --compose-file docker-compose.yml $(APP_NAME)
 
