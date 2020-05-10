@@ -36,12 +36,13 @@ services:
         condition: on-failure
   
   haproxy:
-    image: haproxy:1.7
+    build:
+      context: ./ 
+      dockerfile: ./images/haproxy/Dockerfile
     volumes:
-      - ./haproxy:/haproxy-override
       - ../configs/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
     ports:
-      - '5000:80'
+      - '80:80'
     links:
       - app
 

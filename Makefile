@@ -47,7 +47,7 @@ run: ## Run app without building binary file
 compose-run:
 	./scripts/prod.sh
 
-compose-run:
+compose-run-dev:
 	./scripts/dev.sh
 
 swarm-run:
