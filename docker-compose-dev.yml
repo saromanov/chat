@@ -37,7 +37,7 @@ services:
   
   haproxy:
     build:
-      context: ./ 
+      context: ../..
       dockerfile: ./images/haproxy/Dockerfile
     volumes:
       - ../configs/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
