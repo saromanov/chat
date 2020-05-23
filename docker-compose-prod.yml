@@ -36,14 +36,12 @@ services:
         condition: on-failure
   
   haproxy:
-    image: haproxy:1.7
-    volumes:
-      - ./haproxy:/haproxy-override
-      - ./configs/prometheus/prometheus.yml:/usr/local/etc/haproxy/haproxy.cfg
+    image: motorcode/haproxy-chatapp
     ports:
-      - '5000:80'
+      - '80:80'
     links:
       - app
+  
 
   postgres:
     image: motorcode/chat-postgres:0.0.1

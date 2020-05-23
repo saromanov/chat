@@ -34,13 +34,6 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
-  
-  haproxy:
-    image: motorcode/haproxy-chatapp
-    ports:
-      - '80:80'
-    links:
-      - app
 
   postgres:
     image: motorcode/chat-postgres:0.0.1
@@ -56,6 +49,35 @@ services:
       - "5433:5433"
     networks:
       - test_app
+  loki:
+    image: grafana/loki:1.5.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - loki
+
+  promtail:
+    image: grafana/promtail:1.5.0
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/docker-config.yaml
+    networks:
+      - loki
+
+  grafana:
+    image: grafana/grafana:master
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+    ports:
+      - 3000:3000
+    networks: 
+      - test_app
+    volumes:
+      - ./configs/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ./configs/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
 
 networks:
   test_app:
