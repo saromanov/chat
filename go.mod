@@ -17,6 +17,7 @@ require (
 	github.com/pressly/goose v2.6.0+incompatible
 	github.com/prometheus/client_golang v1.5.1
 	github.com/saromanov/cowrow v0.0.0-20200409190230-745380e3c39c
+	github.com/schoentoon/logrus-loki v0.0.0-20191021224953-4928b3c6b192 // indirect
 	github.com/sirupsen/logrus v1.5.0
 	github.com/swaggo/swag v1.6.5
 	google.golang.org/appengine v1.6.5 // indirect

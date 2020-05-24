@@ -6,6 +6,7 @@ import (
 	"github.com/saromanov/chat/pkg/config"
 	"github.com/saromanov/chat/pkg/server"
 	"github.com/saromanov/chat/pkg/storage"
+	logrusloki "github.com/schoentoon/logrus-loki"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,6 +14,11 @@ func makeLogger() *logrus.Logger {
 	l := logrus.New()
 	l.Out = os.Stdout
 	l.SetFormatter(&logrus.JSONFormatter{})
+	loki, err := logrusloki.NewLoki("http://loki:3100/api/prom/push", 10, 1)
+	if err != nil {
+		panic("unable to init loki")
+	}
+	l.AddHook(loki)
 	return l
 }
 

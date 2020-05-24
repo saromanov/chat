@@ -1,11 +1,8 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
-	"github.com/afiskon/promtail-client/promtail"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/jwtauth"
@@ -23,25 +20,6 @@ type Server struct {
 	log *logrus.Logger
 }
 
-func makePromtail(sourceName, jobName string) (promtail.Client, error) {
-	labels := "{source=\"" + sourceName + "\",job=\"" + jobName + "\"}"
-	conf := promtail.ClientConfig{
-		PushURL:            "http://loki:3100/api/prom/push",
-		Labels:             labels,
-		BatchWait:          5 * time.Second,
-		BatchEntriesNumber: 10000,
-		SendLevel:          promtail.INFO,
-		PrintLevel:         promtail.ERROR,
-	}
-
-	loki, err := promtail.NewClientJson(conf)
-	if err != nil {
-		return nil, fmt.Errorf("unable to init Promtail client: %v", err)
-	}
-
-	return loki, err
-}
-
 // Make provides making of server
 func Make(st *storage.Storage, p *config.Project) {
 	tokenAuth = jwtauth.New("HS256", []byte("secret"), nil)
@@ -49,10 +27,10 @@ func Make(st *storage.Storage, p *config.Project) {
 		db: st,
 	}
 	initPrometheus()
-	loki, err := makePromtail("test", "data")
+	/*loki, err := makePromtail("test", "data")
 	if err != nil {
 		panic(err)
-	}
+	}*/
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -62,7 +40,13 @@ func Make(st *storage.Storage, p *config.Project) {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		totalRequests.Inc()
-		loki.Infof("source = %s time = %s\n", "server", time.Now().Format(time.RFC3339))
+		keys, ok := r.URL.Query()["key"]
+
+		if !ok || len(keys[0]) < 1 {
+			p.Log.WithFields(logrus.Fields{"endpoint": "main"}).Errorf("request argument is not defined")
+			return
+		}
+		p.Log.WithFields(logrus.Fields{"debug": "true"}).Infof("show main page")
 		w.Write([]byte("welcome")) //nolint
 	})
 	r.Route("/users", func(r chi.Router) {
