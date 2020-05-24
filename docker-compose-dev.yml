@@ -55,7 +55,7 @@ services:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
     networks:
-      - loki
+      - test_app
 
   promtail:
     image: grafana/promtail:1.5.0
@@ -63,7 +63,7 @@ services:
       - /var/log:/var/log
     command: -config.file=/etc/promtail/docker-config.yaml
     networks:
-      - loki
+      - test_app
 
   grafana:
     image: grafana/grafana:master
@@ -76,8 +76,6 @@ services:
     volumes:
       - ./configs/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./configs/grafana/datasources:/etc/grafana/provisioning/datasources:ro
-    depends_on:
-      - prometheus
 
 networks:
   test_app:
